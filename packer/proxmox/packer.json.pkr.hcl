@@ -66,17 +66,22 @@ source "proxmox-iso" "windows" {
 build {
   sources = ["source.proxmox-iso.windows"]
 
+  provisioner "file" {
+    source      = "/root/GOAD/packer/proxmox/scripts/sysprep/CloudbaseInitSetup_Stable_x64.msi"
+    destination = "C:/setup/CloudbaseInitSetup_Stable_x64.msi"
+  }
+
   provisioner "powershell" {
     elevated_password = "vagrant"
     elevated_user     = "vagrant"
-    scripts           = ["${path.root}/scripts/sysprep/cloudbase-init.ps1"]
+    scripts           = ["/root/GOAD/packer/proxmox/scripts/sysprep/cloudbase-init.ps1"]
   }
 
   provisioner "powershell" {
     elevated_password = "vagrant"
     elevated_user     = "vagrant"
     pause_before      = "1m0s"
-    scripts           = ["${path.root}/scripts/sysprep/cloudbase-init-p2.ps1"]
+    scripts           = ["/root/GOAD/packer/proxmox/scripts/sysprep/cloudbase-init-p2.ps1"]
   }
 
 }
