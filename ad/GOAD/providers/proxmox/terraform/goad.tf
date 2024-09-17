@@ -33,10 +33,10 @@ variable "vm_config" {
     }
     "dc03" = {
       name               = "GOAD-DC03"
-      desc               = "DC03 - windows server 2016 - 192.168.10.12"
+      desc               = "DC03 - windows server 2019 - 192.168.10.12"
       cores              = 2
       memory             = 3096
-      clone              = "WinServer2016_x64"
+      clone              = "WinServer2019_x64"
       dns                = "192.168.10.1"
       ip                 = "192.168.10.12/24"
       gateway            = "192.168.10.1"
@@ -53,10 +53,10 @@ variable "vm_config" {
     }
     "srv03" = {
       name               = "GOAD-SRV03"
-      desc               = "SRV03 - windows server 2016 - 192.168.10.23"
+      desc               = "SRV03 - windows server 2019 - 192.168.10.23"
       cores              = 2
       memory             = 4096
-      clone              = "WinServer2016_x64"
+      clone              = "WinServer2019_x64"
       dns                = "192.168.10.1"
       ip                 = "192.168.10.23/24"
       gateway            = "192.168.10.1"
