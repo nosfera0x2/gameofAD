@@ -1,21 +1,21 @@
 variable "pm_api_url" {
-  default = "https://192.168.1.1:8006/api2/json"
+  default = "https://192.168.254.213:8006/api2/json"
 }
 
 variable "pm_user" {
-  default = "infra_as_code@pve"
+  default = "root@pam"
 }
 
 variable "pm_password" {
-  default = "CHANGEME"
+  default = "changeme"
 }
 
 variable "pm_node" {
-  default = "proxmox-goad"
+  default = "prox01"
 }
 
 variable "pm_pool" {
-  default = "GOAD"
+  default = "Templates"
 }
 
 variable "pm_full_clone" {
@@ -28,19 +28,19 @@ variable "vm_template_id" {
 
   # set the ids according to your templates
   default = {
-      "WinServer2019_x64"  = 0
-      "WinServer2016_x64"  = 0
-      "Windows10_22h2_x64" = 0
+      "WinServer2019_x64"  = 103
+     # "WinServer2016_x64"  = 0
+     # "Windows10_22h2_x64" = 0
   }
 }
 
 variable "storage" {
   # change this with the name of the storage you use
-  default = "local"
+  default = "local-lvm"
 }
 
 variable "network_bridge" {
-  default = "vmbr3"
+  default = "vmbr0"
 }
 
 variable "network_model" {
@@ -48,17 +48,17 @@ variable "network_model" {
 }
 
 variable "network_vlan" {
-  default = 10
+  default = 20
 }
 
 ## the following variable is only for telmate provider (not used)
 ## change this value with the name of your templates (win10 can be ignored if not used)
-# variable "vm_template_name" {$
-#   type = map(string)
-# 
-#   default = {
-#       "WinServer2019_x64"  = "WinServer2019x64-cloudinit-qcow2"
-#       "WinServer2016_x64"  = "WinServer2016x64-cloudinit-qcow2"
-#       "Windows10_22h2_x64" = "Windows10x64-22h2-cloudinit-qcow2"
-#   }
-# }
+variable "vm_template_name" {
+   type = map(string)
+ 
+   default = {
+        "WinServer2019_x64"  = "WinServer2019x64-cloudinit"
+       "WinServer2016_x64"  = "WinServer2016x64-cloudinit"
+       "Windows10_22h2_x64" = "Windows10x64-22h2-cloudinit"
+   }
+ }
