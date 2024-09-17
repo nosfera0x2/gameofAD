@@ -31,8 +31,8 @@ dns_server=192.168.10.1
 two_adapters=no
 ; adapter created by proxmox (change them if you get an error)
 ; to get the name connect to one vm and run ipconfig it will show you the adapters name
-nat_adapter=Ethernet 2
-domain_adapter=Ethernet 2
+nat_adapter=Ethernet Instance 0 2
+domain_adapter=Ethernet Instance 0 2
 
 ; winrm connection (windows)
 ansible_user=vagrant
