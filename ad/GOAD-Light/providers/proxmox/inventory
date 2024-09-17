@@ -19,8 +19,8 @@ dns_server=x.x.x.x
 two_adapters=yes
 
 ; adapter created by vagrant and virtualbox
-nat_adapter=Ethernet 2
-domain_adapter=Ethernet 2
+nat_adapter=Ethernet Instance 0 2
+domain_adapter=Ethernet Instance 0 2
 
 ; winrm connection (windows)
 ansible_user=vagrant
