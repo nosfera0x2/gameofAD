@@ -18,7 +18,7 @@ variable "vm_config" {
       memory             = 3096
       clone              = "WinServer2019_x64"
       dns                = "192.168.10.1"
-      ip                 = "192.168.10.10/24"
+      ip                 = "192.168.10.10/28"
       gateway            = "192.168.10.1"
     }
     "dc02" = {
@@ -28,7 +28,7 @@ variable "vm_config" {
       memory             = 3096
       clone              = "WinServer2019_x64"
       dns                = "192.168.10.1"
-      ip                 = "192.168.10.11/24"
+      ip                 = "192.168.10.11/28"
       gateway            = "192.168.10.1"
     }
     "srv02" = {
@@ -38,7 +38,7 @@ variable "vm_config" {
       memory             = 4096
       clone              = "WinServer2019_x64"
       dns                = "192.168.10.1"
-      ip                 = "192.168.10.22/24"
+      ip                 = "192.168.10.22/28"
       gateway            = "192.168.10.1"
     }
   }
