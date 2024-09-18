@@ -40,9 +40,9 @@ source "proxmox-iso" "windows" {
   iso_file                 = "${var.iso_file}"
   memory                   = "${var.vm_memory}"
   network_adapters {
-    bridge = "vmbr3"
+    bridge = "vmbr0"
     model  = "virtio"
-    vlan_tag = "10"
+    vlan_tag = "20"
   }
   node                 = "${var.proxmox_node}"
   os                   = "${var.os}"
