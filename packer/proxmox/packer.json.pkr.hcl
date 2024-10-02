@@ -84,4 +84,12 @@ build {
     scripts           = ["/root/gameofAD/packer/proxmox/scripts/sysprep/cloudbase-init-p2.ps1"]
   }
 
+  provisioner "powershell" {
+    elevated_user     = "vagrant"
+    elevated_password = "vagrant"
+    inline = ["Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | ForEach-Object { Set-NetIPInterface -InterfaceAlias $_.Name -Dhcp Enabled; Set-DnsClientServerAddress -InterfaceAlias $_.Name -ResetServerAddresses }"
+  ]
+}
+
+
 }
