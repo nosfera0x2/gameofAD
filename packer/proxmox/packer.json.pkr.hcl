@@ -71,6 +71,38 @@ build {
     destination = "C:/setup/CloudbaseInitSetup_Stable_x64.msi"
   }
 
+  
+  provisioner "powershell" {
+    elevated_user     = "vagrant"
+    elevated_password = "vagrant"
+    inline = ["Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | ForEach-Object { Set-NetIPInterface -InterfaceAlias $_.Name -Dhcp Enabled; Set-DnsClientServerAddress -InterfaceAlias $_.Name -ResetServerAddresses }"
+   ]
+  }
+
+  provisioner "powershell" {
+  inline = [
+    "Set-DnsClientServerAddress -InterfaceAlias 'Ethernet 0 2' -ServerAddresses ('192.168.10.1')",
+    "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings' -Name ProxyServer -Value 'proxy-server:port'",
+    "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings' -Name ProxyEnable -Value 1"
+  ]
+}
+
+
+  provisioner "powershell" {
+  inline = [
+    "if ((Get-Module -ListAvailable -Name PowerShellGet).Version -lt '2.0.0') { Install-Module -Name PowerShellGet -Force }",
+    "if ((Get-PackageProvider -ListAvailable -Name NuGet).Version -lt '2.8.5.201') { Install-PackageProvider -Name NuGet -Force }"
+    ]
+  }
+
+  provisioner "powershell" {
+    inline = [
+      "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12",
+      "Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force",
+      "Install-Module PowerShellGet -Force"
+   ]
+  }
+
   provisioner "powershell" {
     elevated_password = "vagrant"
     elevated_user     = "vagrant"
@@ -83,13 +115,6 @@ build {
     pause_before      = "1m0s"
     scripts           = ["/root/gameofAD/packer/proxmox/scripts/sysprep/cloudbase-init-p2.ps1"]
   }
-
-  provisioner "powershell" {
-    elevated_user     = "vagrant"
-    elevated_password = "vagrant"
-    inline = ["Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | ForEach-Object { Set-NetIPInterface -InterfaceAlias $_.Name -Dhcp Enabled; Set-DnsClientServerAddress -InterfaceAlias $_.Name -ResetServerAddresses }"
-  ]
-}
 
 
 }
