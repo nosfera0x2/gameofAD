@@ -66,6 +66,26 @@ source "proxmox-iso" "windows" {
 build {
   sources = ["source.proxmox-iso.windows"]
 
+    # Ensure WinRM is configured properly
+  provisioner "powershell" {
+    inline = [
+      "winrm quickconfig -quiet",
+      "winrm set winrm/config/service/Auth @{Basic='true'}",
+      "winrm set winrm/config/service @{AllowUnencrypted='false'}",  # Use HTTPS
+      "winrm set winrm/config/Service @{MaxMemoryPerShellMB='1024'}",
+      "winrm set winrm/config/winrs @{MaxProcessesPerShell='25'}",
+      "winrm set winrm/config @{MaxConcurrentOperationsPerUser='25'}",
+      "winrm set winrm/config @{MaxTimeoutms='1800000'}",  # 30-minute timeout for WinRM
+      "winrm set winrm/config @{MaxEnvelopeSizekb='5000'}",  # Max envelope size to 5MB
+      "New-NetFirewallRule -Name 'Allow WinRM HTTPS' -Protocol TCP -LocalPort 5986 -Action Allow"
+    ]
+  }
+
+  # Optional: Add a small delay before uploading the file to stabilize WinRM connection
+  provisioner "powershell" {
+    inline = ["Start-Sleep -Seconds 60"]
+    pause_before = "60s"
+  }
   provisioner "file" {
     source      = "/root/gameofAD/packer/proxmox/scripts/sysprep/CloudbaseInitSetup_Stable_x64.msi"
     destination = "C:/setup/CloudbaseInitSetup_Stable_x64.msi"
