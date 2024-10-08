@@ -5,44 +5,34 @@
             publicKeyToken="31bf3856ad364e35" language="neutral"
             versionScope="nonSxS" processorArchitecture="amd64"
             xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
-
             <DriverPaths>
                 <PathAndCredentials wcm:action="add" wcm:keyValue="2">
                     <Path>F:\viostor\2k19\amd64</Path>
                 </PathAndCredentials>
-
                 <PathAndCredentials wcm:action="add" wcm:keyValue="3">
                     <Path>F:\NetKVM\2k19\amd64</Path>
                 </PathAndCredentials>
-
                 <PathAndCredentials wcm:action="add" wcm:keyValue="4">
                     <Path>F:\Balloon\2k19\amd64</Path>
                 </PathAndCredentials>
-
                 <PathAndCredentials wcm:action="add" wcm:keyValue="5">
                     <Path>F:\pvpanic\2k19\amd64</Path>
                 </PathAndCredentials>
-
                 <PathAndCredentials wcm:action="add" wcm:keyValue="6">
                     <Path>F:\qemupciserial\2k19\amd64</Path>
                 </PathAndCredentials>
-
                 <PathAndCredentials wcm:action="add" wcm:keyValue="7">
                     <Path>F:\qxldod\2k19\amd64</Path>
                 </PathAndCredentials>
-
                 <PathAndCredentials wcm:action="add" wcm:keyValue="8">
                     <Path>F:\vioinput\2k19\amd64</Path>
                 </PathAndCredentials>
-
                 <PathAndCredentials wcm:action="add" wcm:keyValue="9">
                     <Path>F:\viorng\2k19\amd64</Path>
                 </PathAndCredentials>
-
                 <PathAndCredentials wcm:action="add" wcm:keyValue="10">
                     <Path>F:\vioscsi\2k19\amd64</Path>
                 </PathAndCredentials>
-
                 <PathAndCredentials wcm:action="add" wcm:keyValue="11">
                     <Path>F:\vioserial\2k19\amd64</Path>
                 </PathAndCredentials>
@@ -88,9 +78,6 @@
                 </OSImage>
             </ImageInstall>
             <UserData>
-                <ProductKey>
-                    <WillShowUI>OnError</WillShowUI>
-                </ProductKey>
                 <AcceptEula>true</AcceptEula>
                 <FullName>Vagrant</FullName>
                 <Organization>Vagrant</Organization>
@@ -152,42 +139,42 @@
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File G:\fixnetwork.ps1</CommandLine>
                     <Description>Fix public network</Description>
-                    <Order>6</Order>
+                    <Order>2</Order>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File G:\disable-winrm.ps1</CommandLine>
                     <Description>Disable WinRM</Description>
-                    <Order>7</Order>
+                    <Order>3</Order>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "netsh advfirewall firewall set rule group='Windows Remote Management' new enable=yes"</CommandLine>
                     <Description>Enable Windows RDP</Description>
-                    <Order>8</Order>
+                    <Order>4</Order>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "F:\guest-agent\qemu-ga-x86_64.msi /quiet"</CommandLine>
                     <Description>Install drivers</Description>
-                    <Order>9</Order>
+                    <Order>5</Order>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "G:\Install-WMF3Hotfix.ps1"</CommandLine>
                     <Description>Install-WMF3Hotfix</Description>
-                    <Order>10</Order>
+                    <Order>6</Order>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "G:\ConfigureRemotingForAnsible.ps1"</CommandLine>
                     <Description>Configure Remoting for Ansible</Description>
-                    <Order>11</Order>
+                    <Order>7</Order>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File G:\enable-winrm.ps1</CommandLine>
                     <Description>Enable WinRM</Description>
-                    <Order>12</Order>
+                    <Order>8</Order>
                 </SynchronousCommand>
-                 <SynchronousCommand wcm:action="add">
+                <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File G:\extrasteps.ps1</CommandLine>
                     <Description>Extra Steps</Description>
-                    <Order>12</Order>
+                    <Order>9</Order>
                 </SynchronousCommand>
             </FirstLogonCommands>
             <OOBE>
@@ -232,5 +219,4 @@
             <EnableLUA>false</EnableLUA>
         </component>
     </settings>
-    <cpi:offlineImage cpi:source="wim:c:/wim/install.wim#Windows Server 2012 R2 SERVERSTANDARD" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
 </unattend>
