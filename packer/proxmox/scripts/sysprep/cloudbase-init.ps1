@@ -1,14 +1,3 @@
-# Ensure machine is on the 192.168.10.0/28 network with gateway 192.168.10.1
-# $interface = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
-# if ($interface) {
-#    Write-Host "Setting static IP for $($interface.Name)..."
-#    New-NetIPAddress -InterfaceAlias $interface.Name -IPAddress "192.168.10.2" -PrefixLength 28 -DefaultGateway "192.168.10.1" -ErrorAction SilentlyContinue
-#    Set-DnsClientServerAddress -InterfaceAlias $interface.Name -ServerAddresses "192.168.10.1"
-# } else {
-#    Write-Host "No active network adapter found. Ensure you have the correct interface up."
-#    exit 1
-# }
-
 # Install NuGet provider and PowerShellGet module
 Install-PackageProvider -Name Nuget -Force
 Install-Module -Name PowerShellGet -Force
