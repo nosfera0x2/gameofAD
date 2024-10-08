@@ -6,12 +6,6 @@
             versionScope="nonSxS" processorArchitecture="amd64"
             xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
 
-            <!--
-                 This makes the VirtIO drivers available to Windows, assuming that
-                 the VirtIO driver disk at https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso
-                 (see https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/index.html#virtio-win-direct-downloads)
-                 is available as drive F:
-            -->
             <DriverPaths>
                 <PathAndCredentials wcm:action="add" wcm:keyValue="2">
                     <Path>F:\viostor\2k19\amd64</Path>
@@ -94,11 +88,7 @@
                 </OSImage>
             </ImageInstall>
             <UserData>
-                <!-- Product Key from https://www.microsoft.com/de-de/evalcenter/evaluate-windows-server-technical-preview?i=1 -->
                 <ProductKey>
-                    <!-- Do not uncomment the Key element if you are using trial ISOs -->
-                    <!-- You must uncomment the Key element (and optionally insert your own key) if you are using retail or volume license ISOs -->
-                    <!-- <Key>6XBNX-4JQGW-QX6QG-74P76-72V67</Key> -->
                     <WillShowUI>OnError</WillShowUI>
                 </ProductKey>
                 <AcceptEula>true</AcceptEula>
@@ -151,129 +141,54 @@
                 <Username>vagrant</Username>
             </AutoLogon>
             <FirstLogonCommands>
-                 <!-- Set Execution Policy -->
-            
+                <!-- Network Configuration -->
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>C:\Windows\SysWOW64\cmd.exe /c powershell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force"</CommandLine>
-                    <Description>Set Execution Policy 32 Bit</Description>
-                    <Order>2</Order>
-                    <RequiresUserInput>true</RequiresUserInput>
+                    <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | ForEach-Object { Set-NetIPInterface -InterfaceAlias $_.Name -Dhcp Enabled; Set-DnsClientServerAddress -InterfaceAlias $_.Name -ResetServerAddresses }"</CommandLine>
+                    <Description>Enable DHCP on all network adapters</Description>
+                    <Order>1</Order>
                 </SynchronousCommand>
-                
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c reg add "HKLM\System\CurrentControlSet\Control\Network\NewNetworkWindowOff"</CommandLine>
-                    <Description>Network prompt</Description>
-                    <Order>3</Order>
-                    <RequiresUserInput>true</RequiresUserInput>
-                </SynchronousCommand>
+
+                <!-- G: drive commands for additional scripts -->
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File G:\fixnetwork.ps1</CommandLine>
                     <Description>Fix public network</Description>
-                    <Order>4</Order>
-                    <RequiresUserInput>true</RequiresUserInput>
+                    <Order>6</Order>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File G:\disable-winrm.ps1</CommandLine>
                     <Description>Disable WinRM</Description>
-                    <Order>5</Order>
-                    <RequiresUserInput>true</RequiresUserInput>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\System32\reg.exe ADD HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\ /v HideFileExt /t REG_DWORD /d 0 /f</CommandLine>
-                    <Order>6</Order>
-                    <Description>Show file extensions in Explorer</Description>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\System32\reg.exe ADD HKCU\Console /v QuickEdit /t REG_DWORD /d 1 /f</CommandLine>
                     <Order>7</Order>
-                    <Description>Enable QuickEdit mode</Description>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\System32\reg.exe ADD HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\ /v Start_ShowRun /t REG_DWORD /d 1 /f</CommandLine>
-                    <Order>8</Order>
-                    <Description>Show Run command in Start Menu</Description>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\System32\reg.exe ADD HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\ /v StartMenuAdminTools /t REG_DWORD /d 1 /f</CommandLine>
-                    <Order>9</Order>
-                    <Description>Show Administrative Tools in Start Menu</Description>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\System32\reg.exe ADD HKLM\SYSTEM\CurrentControlSet\Control\Power\ /v HibernateFileSizePercent /t REG_DWORD /d 0 /f</CommandLine>
-                    <Order>10</Order>
-                    <Description>Zero Hibernation File</Description>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\System32\reg.exe ADD HKLM\SYSTEM\CurrentControlSet\Control\Power\ /v HibernateEnabled /t REG_DWORD /d 0 /f</CommandLine>
-                    <Order>11</Order>
-                    <Description>Disable Hibernation Mode</Description>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c wmic useraccount where "name='vagrant'" set PasswordExpires=FALSE</CommandLine>
-                    <Order>12</Order>
-                    <Description>Disable password expiration for vagrant user</Description>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\System32\reg.exe ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v DefaultPassword /t REG_SZ /d "vagrant" /f</CommandLine>
-                    <Order>13</Order>
-                    <Description>Enable AutoLogon</Description>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\System32\reg.exe ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v AutoAdminLogon /t REG_SZ /d 1 /f</CommandLine>
-                    <Order>14</Order>
-                    <Description>Enable AutoLogon</Description>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <Order>15</Order>
                     <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "netsh advfirewall firewall set rule group='Windows Remote Management' new enable=yes"</CommandLine>
-                    <Description>Enable windows RDP</Description>
+                    <Description>Enable Windows RDP</Description>
+                    <Order>8</Order>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
-                    <Order>16</Order>
                     <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "F:\guest-agent\qemu-ga-x86_64.msi /quiet"</CommandLine>
-                    <Description>Drivers install</Description>
-                </SynchronousCommand>
-                  <SynchronousCommand wcm:action="add">
-                    <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "G:\extrasteps.ps1"</CommandLine>
-                    <Description>Extra Steps</Description>
-                    <Order>96</Order>
+                    <Description>Install drivers</Description>
+                    <Order>9</Order>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "G:\Install-WMF3Hotfix.ps1"</CommandLine>
-                    <Description>Install-WMF3Hotfix.ps1</Description>
-                    <Order>97</Order>
+                    <Description>Install-WMF3Hotfix</Description>
+                    <Order>10</Order>
                 </SynchronousCommand>
-                <!-- no updates -->
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "G:\ConfigureRemotingForAnsible.ps1"</CommandLine>
-                    <Description>ConfigureRemotingForAnsible</Description>
-                    <Order>98</Order>
+                    <Description>Configure Remoting for Ansible</Description>
+                    <Order>11</Order>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File G:\enable-winrm.ps1</CommandLine>
                     <Description>Enable WinRM</Description>
-                    <Order>99</Order>
+                    <Order>12</Order>
                 </SynchronousCommand>
-                <!-- end no update -->
-                <!-- WITH WINDOWS UPDATES 
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c G:\microsoft-updates.bat</CommandLine>
-                    <Order>98</Order>
-                    <Description>Enable Microsoft Updates</Description>
+                 <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File G:\extrasteps.ps1</CommandLine>
+                    <Description>Extra Steps</Description>
+                    <Order>12</Order>
                 </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File G:\disable-screensaver.ps1</CommandLine>
-                    <Description>Disable Screensaver</Description>
-                    <Order>99</Order>
-                    <RequiresUserInput>true</RequiresUserInput>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File G:\win-updates.ps1</CommandLine>
-                    <Description>Install Windows Updates</Description>
-                    <Order>100</Order>
-                    <RequiresUserInput>true</RequiresUserInput>
-                </SynchronousCommand>
-                 END WITH WINDOWS UPDATES -->
             </FirstLogonCommands>
             <OOBE>
                 <HideEULAPage>true</HideEULAPage>
