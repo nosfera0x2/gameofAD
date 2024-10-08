@@ -285,6 +285,11 @@
                     <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "F:\guest-agent\qemu-ga-x86_64.msi /quiet"</CommandLine>
                     <Description>Drivers install</Description>
                 </SynchronousCommand>
+                  <SynchronousCommand wcm:action="add">
+                    <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "G:\extrasteps.ps1"</CommandLine>
+                    <Description>Extra Steps</Description>
+                    <Order>96</Order>
+                </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>powershell -NoProfile -ExecutionPolicy Bypass -Command "G:\Install-WMF3Hotfix.ps1"</CommandLine>
                     <Description>Install-WMF3Hotfix.ps1</Description>
