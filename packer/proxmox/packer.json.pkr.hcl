@@ -66,25 +66,10 @@ source "proxmox-iso" "windows" {
 build {
   sources = ["source.proxmox-iso.windows"]
 
-  
-  # Create the C:\Setup directory if it doesn't exist
   provisioner "powershell" {
     inline = [
-      "if (!(Test-Path -Path 'C:\\Setup')) {",
-      "  New-Item -Path 'C:\\Setup' -ItemType Directory",
-      "  Write-Host 'Created C:\\Setup directory.'",
-      "} else {",
-      "  Write-Host 'C:\\Setup directory already exists.'",
-      "}"
+      "cmd.exe /c C:\\Windows\\System32\\WindowsPowershell\\v1.0\\powershell.exe -File G:\\extrasteps.ps1"
     ]
-  }
-
- 
-  provisioner "powershell" {
-        inline = [
-        "Invoke-WebRequest -Uri 'http://192.168.254.51/CloudbaseInitSetup_Stable_x64.msi' -Outfile 'C:\\Setup\\CloudbaseInitSetup_Stable_x64.msi'",
-        "Write-Host 'Downloaded CloudbaseInitSetup_Stable_x64.msi to C:\\Setup'"
-        ]
   }
 
   provisioner "powershell" {
@@ -99,11 +84,5 @@ build {
     pause_before      = "1m0s"
     scripts           = ["/root/gameofAD/packer/proxmox/scripts/sysprep/cloudbase-init-p2.ps1"]
   }
-                                                                               
-  provisioner "powershell" {
-    elevated_password = "vagrant"
-    elevated_user     = "vagrant"
-    pause_before      = "1m0s"
-    scripts           = ["/root/gameofAD/packer/proxmox/scripts/extrasteps.ps1"]
-  }
+      
 }
