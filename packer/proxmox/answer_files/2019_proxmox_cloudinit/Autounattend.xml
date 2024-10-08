@@ -152,66 +152,14 @@
             </AutoLogon>
             <FirstLogonCommands>
                  <!-- Set Execution Policy -->
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c powershell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force"</CommandLine>
-                    <Description>Set Execution Policy</Description>
-                    <Order>1</Order>
-                    <RequiresUserInput>false</RequiresUserInput>
-                </SynchronousCommand>
-
-                <!-- Install NuGet and PowerShellGet -->
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>powershell -Command "Install-PackageProvider -Name NuGet -Force; Install-Module -Name PowerShellGet -Force"</CommandLine>
-                    <Description>Install NuGet and PowerShellGet</Description>
-                    <Order>2</Order>
-                    <RequiresUserInput>false</RequiresUserInput>
-                </SynchronousCommand>
-
-                <!-- Set Security Protocol to TLS 1.2 -->
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12"</CommandLine>
-                    <Description>Set TLS 1.2 Security Protocol</Description>
-                    <Order>3</Order>
-                    <RequiresUserInput>false</RequiresUserInput>
-                </SynchronousCommand>
-
-                <!-- Set all network adapters to use DHCP and reset DNS server addresses -->
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>powershell -Command "Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | ForEach-Object { Set-NetIPInterface -InterfaceAlias $_.Name -Dhcp Enabled; Set-DnsClientServerAddress -InterfaceAlias $_.Name -ResetServerAddresses }"</CommandLine>
-                    <Description>Configure DHCP and DNS for all network adapters</Description>
-                    <Order>4</Order>
-                    <RequiresUserInput>false</RequiresUserInput>
-                </SynchronousCommand>
-
-                <!-- Set a specific DNS server for 'Ethernet 0 2' adapter -->
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>powershell -Command "Set-DnsClientServerAddress -InterfaceAlias 'Ethernet 0 2' -ServerAddresses ('192.168.10.1')"</CommandLine>
-                    <Description>Set DNS server for Ethernet 0 2 adapter</Description>
-                    <Order>5</Order>
-                    <RequiresUserInput>false</RequiresUserInput>
-                </SynchronousCommand>
-
-                <!-- Configure proxy settings -->
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>powershell -Command "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings' -Name ProxyServer -Value 'proxy-server:port'; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings' -Name ProxyEnable -Value 1"</CommandLine>
-                    <Description>Configure Proxy Server</Description>
-                    <Order>6</Order>
-                    <RequiresUserInput>false</RequiresUserInput>
-                </SynchronousCommand>
-                
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c powershell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force"</CommandLine>
-                    <Description>Set Execution Policy 64 Bit</Description>
-                    <Order>1</Order>
-                    <RequiresUserInput>true</RequiresUserInput>
-                </SynchronousCommand>
-                
+            
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>C:\Windows\SysWOW64\cmd.exe /c powershell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force"</CommandLine>
                     <Description>Set Execution Policy 32 Bit</Description>
                     <Order>2</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
+                
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c reg add "HKLM\System\CurrentControlSet\Control\Network\NewNetworkWindowOff"</CommandLine>
                     <Description>Network prompt</Description>
