@@ -67,6 +67,13 @@
     }
   register: install_psresourceget
 
+- name: Register PSGallery repository if not present
+  win_shell: |
+    if (-not (Get-PSRepository -Name PSGallery)) {
+      Register-PSRepository -Name "PSGallery" -SourceLocation "https://www.powershellgallery.com/api/v2" -InstallationPolicy Trusted
+    }
+  register: register_repo
+
 - name: Windows | Check for ComputerManagementDsc Powershell module
   win_shell: |
     Install-Module -Name ComputerManagementDsc -Force
