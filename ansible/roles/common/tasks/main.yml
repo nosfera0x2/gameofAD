@@ -15,13 +15,6 @@
       - "192.168.10.1"
   when: force_dns_server == "yes"
 
-- name: Set a proxy for specific protocols
-  community.windows.win_http_proxy:
-    proxy:
-      http: "{{ad_http_proxy}}"
-      https: "{{ad_https_proxy}}"
-  when: http_proxy == "yes"
-
 - name: Configure IE to use a specific proxy per protocol
   community.windows.win_inet_proxy:
     proxy:
