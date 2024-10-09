@@ -65,18 +65,21 @@
     }
   register: install_psresourceget
 
-- name: Register PSGallery repository if not present
+- name: "Ensure PSGallery repository is registered"
   win_shell: |
-    if (-not (Get-PSRepository -Name PSGallery)) {
-      Register-PSRepository -Name "PSGallery" -SourceLocation "https://www.powershellgallery.com/api/v2" -InstallationPolicy Trusted
-    }
-  register: register_repo
+    Unregister-PSRepository -Name PSGallery -ErrorAction SilentlyContinue
+    Register-PSRepository -Default
+  register: psrepository_result
+  changed_when: psrepository_result.rc == 0
 
-- name: Windows | Check for ComputerManagementDsc Powershell module
+- name: "Check and install ComputerManagementDsc module"
   win_shell: |
-    Install-Module -Name ComputerManagementDsc -Force
+    if (-not (Get-Module -ListAvailable -Name ComputerManagementDsc)) {
+      Install-Module -Name ComputerManagementDsc -Force
+    }
     Import-Module ComputerManagementDsc
-  register: install_computermanagementdsc
+  register: computermgmt_result
+  changed_when: computermgmt_result.rc == 0
 
 - name: Windows | Enable Remote Desktop
   win_dsc:
