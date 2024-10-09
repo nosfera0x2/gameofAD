@@ -1,3 +1,4 @@
+---
 - name: "Force a DNS on the adapter {{nat_adapter}}"
   ansible.windows.win_dns_client:
     adapter_names: "{{nat_adapter}}"
@@ -20,16 +21,49 @@
       https: "{{ad_https_proxy}}"
   when: http_proxy == "yes"
 
-- name: Upgrade module PowerShellGet to fix accept license issue on last windows ansible version
+- name: Ensure TLS 1.2 is enabled for the current session
   win_shell: |
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    Install-PackageProvider -Name NuGet -Force
-    Install-Module PowerShellGet -Force
+    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+  register: tls_result
+  changed_when: false  # This command only modifies the session and doesn't require change detection
+
+- name: Check PowerShellGet and PackageManagement version
+  win_shell: |
+    Get-Module PowerShellGet, PackageManagement -ListAvailable | Select-Object Name, Version
+  register: module_versions
+
+- name: Debug installed versions of PowerShellGet and PackageManagement
+  debug:
+    var: module_versions.stdout_lines
+
+- name: Install latest stable version of PowerShellGet if needed
+  win_shell: |
+    $psGetVersion = (Get-Module PowerShellGet -ListAvailable).Version
+    if ($psGetVersion -lt [version]"2.2.5") {
+      Install-Module PowerShellGet -Force -AllowClobber
+    }
+  register: install_psget
+
+- name: Install latest stable version of PackageManagement if needed
+  win_shell: |
+    $pkgMgmtVersion = (Get-Module PackageManagement -ListAvailable).Version
+    if ($pkgMgmtVersion -lt [version]"1.4.8.1") {
+      Install-Module PackageManagement -Force -AllowClobber
+    }
+  register: install_pkgmgmt
+
+- name: Install Microsoft.PowerShell.PSResourceGet if not installed
+  win_shell: |
+    if (-not (Get-Module -ListAvailable -Name Microsoft.PowerShell.PSResourceGet)) {
+      Install-Module Microsoft.PowerShell.PSResourceGet -Repository PSGallery
+    }
+  register: install_psresourceget
 
 - name: Windows | Check for ComputerManagementDsc Powershell module
-  win_psmodule:
-    name: ComputerManagementDsc
-    state: present
+  win_shell: |
+    Install-Module -Name ComputerManagementDsc -Force
+    Import-Module ComputerManagementDsc
+  register: install_computermanagementdsc
 
 - name: Windows | Enable Remote Desktop
   win_dsc:
@@ -53,4 +87,4 @@
     Direction: "Inbound"
     Localport: "3389"
     Protocol: "TCP"
-    Description: "Opens the listener port for RDP"
+
