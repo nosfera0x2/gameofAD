@@ -46,6 +46,18 @@
     }
   register: install_pkgmgmt
 
+- name: Ensure NuGet PackageProvider is installed
+  ansible.builtin.win_shell: |
+    $nugetProvider = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
+    if (-not $nugetProvider -or $nugetProvider.Version -lt [version]"2.8.5.201") {
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+    } else {
+        Write-Host "NuGet PackageProvider is already installed and meets the required version."
+    }
+  register: nuget_install_result
+  changed_when: nuget_install_result.rc == 0
+
+
 - name: Install Microsoft.PowerShell.PSResourceGet if not installed
   win_shell: |
     if (-not (Get-Module -ListAvailable -Name Microsoft.PowerShell.PSResourceGet)) {
