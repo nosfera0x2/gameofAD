@@ -52,6 +52,13 @@
     [System.Net.WebRequest]::DefaultWebProxy = New-Object System.Net.WebProxy
   register: no_proxy_setup
 
+- name: Ensure PSGallery repository is registered
+  win_shell: |
+    Unregister-PSRepository -Name PSGallery -ErrorAction SilentlyContinue
+    Register-PSRepository -Default
+  register: psrepository_result
+  changed_when: psrepository_result.rc == 0
+
 - name: Check PowerShellGet and PackageManagement version
   win_shell: |
     Get-Module PowerShellGet, PackageManagement -ListAvailable | Select-Object Name, Version
@@ -88,20 +95,12 @@
   register: nuget_install_result
   changed_when: nuget_install_result.rc == 0
 
-
 - name: Install Microsoft.PowerShell.PSResourceGet if not installed
   win_shell: |
     if (-not (Get-Module -ListAvailable -Name Microsoft.PowerShell.PSResourceGet)) {
       Install-Module Microsoft.PowerShell.PSResourceGet -Repository PSGallery
     }
   register: install_psresourceget
-
-- name: "Ensure PSGallery repository is registered"
-  win_shell: |
-    Unregister-PSRepository -Name PSGallery -ErrorAction SilentlyContinue
-    Register-PSRepository -Default
-  register: psrepository_result
-  changed_when: psrepository_result.rc == 0
 
 - name: "Check and install ComputerManagementDsc module"
   win_shell: |
@@ -134,4 +133,3 @@
     Direction: "Inbound"
     Localport: "3389"
     Protocol: "TCP"
-
