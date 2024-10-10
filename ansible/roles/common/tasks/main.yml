@@ -15,19 +15,23 @@
       - "192.168.10.1"
   when: force_dns_server == "yes"
 
-- name: Disable Proxy Auto-Configuration by changing registry key
-  ansible.windows.win_regedit:
-    path: 'HKLM:\SYSTEM\CurrentControlSet\Services\WinHttpAutoProxySvc'
-    name: 'Start'
-    data: 4
-    type: dword
-  register: proxy_registry
+- name: Disable Proxy Auto-Configuration using PowerShell
+  ansible.windows.win_shell: |
+    Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\WinHttpAutoProxySvc' -Name 'Start' -Value 4
+    $result = Get-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\WinHttpAutoProxySvc' -Name 'Start'
+    if ($result.Start -ne 4) {
+      Write-Host "Failed to disable Proxy Auto-Configuration"
+      exit 1
+    } else {
+      Write-Host "Proxy Auto-Configuration successfully disabled"
+    }
+  register: proxy_auto_config_disabled
 
-- name: Validate if Proxy Auto-Configuration is disabled
+- name: Fail if PowerShell script did not succeed
   ansible.builtin.fail:
-    msg: "Failed to disable Proxy Auto-Configuration"
-  when: proxy_registry.changed == false
-  
+    msg: "Failed to disable Proxy Auto-Configuration using PowerShell"
+  when: proxy_auto_config_disabled.rc != 0
+
 - name: Reboot the machine to apply the changes
   ansible.windows.win_reboot:
     reboot_timeout: 600
