@@ -47,6 +47,11 @@
   register: tls_result
   changed_when: false  # This command only modifies the session and doesn't require change detection
 
+- name: Ensure no proxy is being used for registering or downloading from PSGallery
+  ansible.windows.win_shell: |
+    [System.Net.WebRequest]::DefaultWebProxy = New-Object System.Net.WebProxy
+  register: no_proxy_setup
+
 - name: Check PowerShellGet and PackageManagement version
   win_shell: |
     Get-Module PowerShellGet, PackageManagement -ListAvailable | Select-Object Name, Version
