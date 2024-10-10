@@ -36,6 +36,11 @@
     reboot_timeout: 600
     connect_timeout: 300
     
+- name: Reset the WinHTTP proxy settings
+  ansible.windows.win_shell: |
+    netsh winhttp reset proxy
+  register: proxy_reset
+
 - name: Ensure TLS 1.2 is enabled for the current session
   win_shell: |
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
