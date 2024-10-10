@@ -20,7 +20,6 @@
     cmd: |
       Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "AutoDetect" -Value 0
   register: proxy_auto_detect
-  changed_when: proxy_auto_detect.rc == 0
 
 - name: Ensure TLS 1.2 is enabled for the current session
   win_shell: |
