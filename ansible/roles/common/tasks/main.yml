@@ -27,6 +27,16 @@
   ansible.builtin.fail:
     msg: "Failed to disable Proxy Auto-Configuration"
   when: proxy_registry.changed == false
+  
+- name: Reboot the machine to apply the changes
+  ansible.windows.win_reboot:
+    reboot_timeout: 600
+  when: proxy_auto_config_disabled.rc == 0
+
+- name: Wait for the system to reboot
+  ansible.windows.win_reboot:
+    reboot_timeout: 600
+  when: proxy_auto_config_disabled.reboot_required == True
 
 - name: Ensure TLS 1.2 is enabled for the current session
   win_shell: |
