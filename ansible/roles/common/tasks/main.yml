@@ -19,13 +19,13 @@
   ansible.windows.win_shell:
     cmd: |
       Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "AutoDetect" -Value 0
-      if ((Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "AutoDetect").AutoDetect -eq 0) {
-        exit 0
-      } else {
-        exit 1
-      }
+      (Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "AutoDetect").AutoDetect
   register: proxy_auto_detect
-  failed_when: proxy_auto_detect.rc != 0
+
+- name: Check if 'Automatically detect settings' was disabled successfully
+  ansible.builtin.fail:
+    msg: "'Automatically detect settings' was not disabled"
+  when: proxy_auto_detect.stdout != '0'
 
 - name: Ensure TLS 1.2 is enabled for the current session
   win_shell: |
