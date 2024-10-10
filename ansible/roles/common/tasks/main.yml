@@ -18,7 +18,6 @@
 - name: Disable 'Automatically detect settings' in Proxy settings
   win_shell: |
       Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "AutoDetect" -Value 0
-      (Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "AutoDetect").AutoDetect
   register: proxy_auto_detect
 
 - name: Ensure TLS 1.2 is enabled for the current session
