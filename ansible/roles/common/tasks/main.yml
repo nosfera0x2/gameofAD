@@ -14,7 +14,7 @@
     dns_servers:
       - "192.168.10.1"
   when: force_dns_server == "yes"
-
+  
 - name: Disable Proxy Auto-Configuration using PowerShell
   ansible.windows.win_shell: |
     Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\WinHttpAutoProxySvc' -Name 'Start' -Value 4
@@ -27,16 +27,15 @@
     }
   register: proxy_auto_config_disabled
 
-- name: Fail if PowerShell script did not succeed
-  ansible.builtin.fail:
-    msg: "Failed to disable Proxy Auto-Configuration using PowerShell"
-  when: proxy_auto_config_disabled.rc != 0
-
 - name: Reboot the machine to apply the changes
   ansible.windows.win_reboot:
     reboot_timeout: 600
-  when: proxy_auto_config_disabled.rc == 0
-  
+
+- name: Wait for the system to reboot
+  ansible.windows.win_reboot:
+    reboot_timeout: 600
+    connect_timeout: 300
+    
 - name: Ensure TLS 1.2 is enabled for the current session
   win_shell: |
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
