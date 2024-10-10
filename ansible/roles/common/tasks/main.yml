@@ -36,12 +36,7 @@
   ansible.windows.win_reboot:
     reboot_timeout: 600
   when: proxy_auto_config_disabled.rc == 0
-
-- name: Wait for the system to reboot
-  ansible.windows.win_reboot:
-    reboot_timeout: 600
-  when: proxy_auto_config_disabled.reboot_required == True
-
+  
 - name: Ensure TLS 1.2 is enabled for the current session
   win_shell: |
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
