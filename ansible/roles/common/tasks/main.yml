@@ -1,4 +1,16 @@
 ---
+- name: Make the proxy setting persistent in PowerShell profile
+  ansible.windows.win_shell: |
+    $profilePath = [System.IO.Path]::Combine($env:USERPROFILE, 'Documents', 'WindowsPowerShell', 'profile.ps1')
+    if (-not (Test-Path -Path $profilePath)) {
+      New-Item -ItemType File -Path $profilePath -Force
+    }
+    $proxyCommand = '[System.Net.WebRequest]::DefaultWebProxy = New-Object System.Net.WebProxy'
+    if (-not (Select-String -Path $profilePath -Pattern $proxyCommand)) {
+      Add-Content -Path $profilePath -Value $proxyCommand
+    }
+  changed_when: false
+
 - name: "Get network adapter names"
   ansible.windows.win_shell: |
     Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | Select-Object -ExpandProperty Name
@@ -36,21 +48,11 @@
     reboot_timeout: 600
     connect_timeout: 300
     
-- name: Reset the WinHTTP proxy settings
-  ansible.windows.win_shell: |
-    netsh winhttp reset proxy
-  register: proxy_reset
-
 - name: Ensure TLS 1.2 is enabled for the current session
   win_shell: |
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
   register: tls_result
   changed_when: false  # This command only modifies the session and doesn't require change detection
-
-- name: Ensure no proxy is being used for registering or downloading from PSGallery
-  ansible.windows.win_shell: |
-    [System.Net.WebRequest]::DefaultWebProxy = New-Object System.Net.WebProxy
-  register: no_proxy_setup
 
 - name: Ensure PSGallery repository is registered
   win_shell: |
@@ -59,54 +61,9 @@
   register: psrepository_result
   changed_when: psrepository_result.rc == 0
 
-- name: Check PowerShellGet and PackageManagement version
-  win_shell: |
-    Get-Module PowerShellGet, PackageManagement -ListAvailable | Select-Object Name, Version
-  register: module_versions
-
-- name: Debug installed versions of PowerShellGet and PackageManagement
-  debug:
-    var: module_versions.stdout_lines
-
-- name: Install latest stable version of PowerShellGet if needed
-  win_shell: |
-    $psGetVersion = (Get-Module PowerShellGet -ListAvailable).Version
-    if ($psGetVersion -lt [version]"2.2.5") {
-      Install-Module PowerShellGet -Force -AllowClobber
-    }
-  register: install_psget
-
-- name: Install latest stable version of PackageManagement if needed
-  win_shell: |
-    $pkgMgmtVersion = (Get-Module PackageManagement -ListAvailable).Version
-    if ($pkgMgmtVersion -lt [version]"1.4.8.1") {
-      Install-Module PackageManagement -Force -AllowClobber
-    }
-  register: install_pkgmgmt
-
-- name: Ensure NuGet PackageProvider is installed
-  ansible.builtin.win_shell: |
-    $nugetProvider = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
-    if (-not $nugetProvider -or $nugetProvider.Version -lt [version]"2.8.5.201") {
-        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-    } else {
-        Write-Host "NuGet PackageProvider is already installed and meets the required version."
-    }
-  register: nuget_install_result
-  changed_when: nuget_install_result.rc == 0
-
-- name: Install Microsoft.PowerShell.PSResourceGet if not installed
-  win_shell: |
-    if (-not (Get-Module -ListAvailable -Name Microsoft.PowerShell.PSResourceGet)) {
-      Install-Module Microsoft.PowerShell.PSResourceGet -Repository PSGallery
-    }
-  register: install_psresourceget
-
 - name: "Check and install ComputerManagementDsc module"
   win_shell: |
-    if (-not (Get-Module -ListAvailable -Name ComputerManagementDsc)) {
-      Install-Module -Name ComputerManagementDsc -Force
-    }
+    Install-Module -Name ComputerManagementDsc -Force
     Import-Module ComputerManagementDsc
   register: computermgmt_result
   changed_when: computermgmt_result.rc == 0
