@@ -77,7 +77,7 @@
 
 - name: Windows | Install xNetworking Powershell module
   win_shell:
-    Install-Module -Name xNetworking
+    Install-Module -Name xNetworking -Force
     Import-Module xNetworking
   register: xnetworking_result
   changed_when: xnetworking_result.rc == 0
